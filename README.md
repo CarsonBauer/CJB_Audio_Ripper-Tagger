@@ -7,5 +7,6 @@ Python script I made to rip and tag audio from a CD drive. Intended for use on L
 - Python runtime
 
 # Usage
-** python get_albums.py [Artist Name] -a [Album Name] **
+**python get_albums.py [Artist Name] -a [Album Name]**
+
 Run the script by passing in the name of the artist followed by the name of the album you are ripping. A prompt will then show listing all different releases of the given album from the given artist. Select the index of the release to select the release that is being ripped.

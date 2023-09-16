@@ -49,16 +49,15 @@ def list_songs(songs, reid):
 # Rip audio, store in created directories, convert to mp3 and remove WAVE files if album does not yet exist
 def rip_audio(artist, album, exists):
     if (exists == 0):
-        if (os.system("cd {Artist}/{Album} && cdparanoia -XB".format(Artist=artist, Album=album)) != 0):
+        if (os.system("cd \'{Artist}\'/\'{Album}\' && cdparanoia -XB".format(Artist=artist, Album=album)) != 0):
             return "ERROR: Cannot rip from CD reader"
 
         for file in os.listdir("{Artist}/{Album}".format(Artist=artist, Album=album)):
-            if (os.system("cd {Artist}/{Album} && lame -b 320 {song}".format(song=file, Artist=artist, Album=album)) != 0):
+            if (os.system("cd \'{Artist}\'/\'{Album}\' && lame -b 320 {song}".format(song=file, Artist=artist, Album=album)) != 0):
                 return "ERROR: Cannot rip from CD reader"
 
-        if (os.system("cd {Artist}/{Album} && rm *.wav".format(Artist=artist, Album=album)) != 0):
+        if (os.system("cd \'{Artist}\'/\'{Album}\' && rm *.wav".format(Artist=artist, Album=album)) != 0):
             return "ERROR: Cannot remove .wav files"
-
         return "OK"
     else:
         print("Album already exists. Moving on to tagging.")
@@ -79,6 +78,8 @@ def tag_albums(artist, album, songs):
         audio = EasyMP3(file_path)
         audio["Artist"] = artist
         audio["Title"] = songs[count]['title']
+        audio["tracknumber"] = '{}/{}'.format(songs[count]['offset'] + 1, len(songs))
+        audio["Album"] = album
         audio.save()
         #os.system("mv \'{OLD_PATH}\' \'{NEW_PATH}\'".format(OLD_PATH=file_path, NEW_PATH=new_file_path))
         count = count + 1
@@ -102,11 +103,11 @@ def run_script():
             if (i < len(sys.argv) - 1):
                 album += " "
 
-    #exists = create_directories(artist, album)
-    #rip_status = rip_audio(artist, album, exists)
+    exists = create_directories(artist, album)
+    rip_status = rip_audio(artist, album, 0)
 
-    #if (rip_status != "OK"):
-    #    return "ERROR: Ripping process failed"
+    if (rip_status != "OK"):
+        return "ERROR: Ripping process failed"
 
     releases = get_albums(album, artist)
     list_releases(releases)
